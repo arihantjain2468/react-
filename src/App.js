@@ -6,6 +6,10 @@ import './App.css';
 //import {DISHES} from './Shared/dishes';
 import { Component } from 'react';
 import {BrowserRouter} from 'react-router-dom';
+import { Provider } from "react-redux";
+import { ConfigureStore } from "./Redux/configureStore";
+
+const store= ConfigureStore();
 
 class App extends Component {
   // constructor(props){
@@ -17,6 +21,7 @@ class App extends Component {
   // function App() {
   render() {
     return (
+      <Provider store={store}>
       <BrowserRouter>
       <div>
         {/* <header className="App-header">
@@ -42,6 +47,7 @@ class App extends Component {
         <Main />
       </div>
       </BrowserRouter>
+      </Provider>
     );
   }
 }
