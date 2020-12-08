@@ -3,6 +3,9 @@ import { Card, CardImg, CardText, CardBody, CardTitle, Breadcrumb, BreadcrumbIte
 //import Item from './Item';
 import { Link } from 'react-router-dom';
 import { Control, LocalForm, Errors } from 'react-redux-form';
+import { Loading } from './LoadingComponent';
+import { baseUrl } from '../Shared/baseUrl';
+import { FadeTransform, Fade, Stagger } from 'react-animation-components';
 
 // class Dishe extends Component {
 
@@ -18,28 +21,39 @@ import { Control, LocalForm, Errors } from 'react-redux-form';
 function Item(props) {
     const com = props.comments.map((commen) => {
         return (
-            <div key={commen.id}>
-                <p>{commen.comment}<br /></p>
+            <Fade in>
+            <li key={commen.id}>
+                <p>{commen.comment}</p>
                 <p>--{commen.author} ,{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', date: '2-digit' }).format(new Date(Date.parse(commen.date)))}</p>
-            </div>
+            </li>
+            </Fade>
         );
     });
     return (
         <div>
+            <Stagger in>
             {com}
-            <CommentForm />
+            </Stagger>
+            <CommentForm dishId={props.dishId} postComment={props.postComment} />
         </div>
     );
 }
 function RenderDish({ dish }) {
     return (
+        <FadeTransform
+        in
+        transformProps={{
+            exitTransform: 'scale(0.5) translateY(-50%)'
+        }}>
         <Card>
-            <CardImg width="100%" src={dish.image} alt={dish.name} />
+            <CardImg width="100%" src={baseUrl + dish.image} alt={dish.name} />
             <CardBody>
                 <CardTitle>{dish.name}</CardTitle>
                 <CardText>{dish.description}</CardText>
             </CardBody>
-        </Card>);
+        </Card>
+        </FadeTransform>
+        );
 }
 
 const maxLength = (len) => (val) => !(val) || (val.length <= len);
@@ -61,10 +75,12 @@ class CommentForm extends Component {
         });
     }
     handleSubmit(values) {
-        console.log('Current State is: ' + JSON.stringify(//this.state
-            values));
-        alert('Current State is: ' + JSON.stringify(//this.state
-            values));
+        // console.log('Current State is: ' + JSON.stringify(//this.state
+        //     values));
+        // alert('Current State is: ' + JSON.stringify(//this.state
+        //     values));
+        this.toggleModal();
+        this.props.postComment(this.props.dishId, values.rating, values.author, values.comment);
     }
     render() {
         return (
@@ -76,7 +92,7 @@ class CommentForm extends Component {
                         <LocalForm onSubmit={(values) => this.handleSubmit(values)}>
                             <div className="form-group">
                                 <Label htmlFor="rating" >Rating</Label>
-                                <Control.select model=".rating" name="rating" import = "Select..."
+                                <Control.select model=".rating" name="rating" import="Select..."
                                     className="form-control">
                                     <option>1</option>
                                     <option>2</option>
@@ -112,8 +128,8 @@ class CommentForm extends Component {
                                     className="form-control" />
                             </div>
                             <div className="form-group">
-                                    <Button type="submit" color="primary">
-                                        Submit
+                                <Button type="submit" color="primary">
+                                    Submit
                                     </Button>
                             </div>
                         </LocalForm>
@@ -127,7 +143,25 @@ class CommentForm extends Component {
 const Dishe = (props) => {
     //const dish = this.props.dish;
     console.log(props);
-    if (props.dish != null) {
+    if (props.isLoading) {
+        return (
+            <div className="container">
+                <div classname="row">
+                    <Loading />
+                </div>
+            </div>
+        );
+    }
+    else if (props.errMess) {
+        return (
+            <div className="container">
+                <div classname="row">
+                    <h4>{this.props.errMess}</h4>
+                </div>
+            </div>
+        );
+    }
+    else if (props.dish != null) {
         return (
             <div className="container">
                 <div className="row">
@@ -155,7 +189,9 @@ const Dishe = (props) => {
                     </div>
                     <div className="col-12 col-md-5 m-3">
                         <p><strong>Comments</strong><br /></p>
-                        <p> <Item comments={props.comments} />
+                        <p> <Item comments={props.comments}
+                            postComment={props.postComment}
+                            dishId={props.dish.id} />
                         </p>
                     </div>
                 </div>
