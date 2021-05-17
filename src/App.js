@@ -10,7 +10,7 @@ import { Provider } from "react-redux";
 import { ConfigureStore } from "./Redux/configureStore";
 
 const store= ConfigureStore();
-
+//check merge
 class App extends Component {
   // constructor(props){
   //   super(props);
